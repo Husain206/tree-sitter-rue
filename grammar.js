@@ -27,14 +27,6 @@ module.exports = grammar({
     $.comment,
   ],
 
-  conflicts: ($) => [
-    [$.array, $.array_pattern],
-    [$.expression, $.pattern],
-    [$.return_statement],
-    [$._statement, $.call_expression],
-    [$.expression, $.array_pattern],
-  ],
-
   word: ($) => $.identifier,
 
   rules: {
@@ -59,6 +51,7 @@ module.exports = grammar({
       field("name", $.pattern),
       optional(seq(":", $._type)),
       optional(seq("=", $.expression)),
+      ";"
     ),
 
     // ---- Parameters ----
@@ -99,9 +92,9 @@ module.exports = grammar({
       ";",
     ),
 
-    _expression_statement: ($) => $.expression,
+    _expression_statement: ($) => seq($.expression, ";"),
 
-    return_statement: ($) => seq("return", optional($.expression)),
+    return_statement: ($) => seq("return", optional($.expression), ";"),
 
     if_statement: ($) => seq(
       "if", $.expression, $.block,
@@ -112,8 +105,8 @@ module.exports = grammar({
       "for", $.identifier, "in", $.expression, $.block
     ),
 
-    break_statement: ($) => "break",
-    continue_statement: ($) => "continue",
+    break_statement: ($) => seq("break", ";"),
+    continue_statement: ($) => seq("continue", ";"),
 
     block: ($) => seq("{", repeat($._statement), "}"),
 
@@ -144,7 +137,7 @@ module.exports = grammar({
       ")"
     ),
 
-    field_expression: ($) => seq($.expression, ".", $.identifier),
+    field_expression: ($) => seq($.expression, ".", field("field", $.identifier)),
 
     unary_expression: ($) => prec(PREC.prefix, seq(
       choice("-", "+", "++", "--", "!"),

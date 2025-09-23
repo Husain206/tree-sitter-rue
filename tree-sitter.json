@@ -6,6 +6,8 @@
       "camelcase": "Rue",
       "title": "Rue",
       "scope": "source.rue",
+      "highlights": "queries/highlights.scm",
+      "injections": "queries/injections.scm",
       "file-types": [
         "rue"
       ],
