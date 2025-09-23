@@ -1,20 +1,39 @@
+; Keywords
+[
+  "fn"
+  "return"
+  "let"
+  "var"
+  "set"
+  "for"
+  "if"
+  "else"
+  "break"
+  "continue"
+] @keyword
 
-["fn", "return", "set", "brint", "inbut", "for", "if", "ala", "else", "continue", "break"] @keyword
+; Built-in types
+(identifier) @type.builtin
+  (#match? @type.builtin "^(int|string|bool|set)$")
 
-; Types
-(type) @type
-(identifier) @type.builtin (#match? @type.builtin "^(int|string|bool|set)$")
-
-; Literals
+; Numbers
 (number) @number
+
+; Strings
 (string) @string
+(string_item) @constant.character
 (string_esc) @constant.character.escape
 
-; Functions
+; Function definitions and calls
 (fn_def name: (identifier) @function)
 (call_expression function: (identifier) @function.call)
 
-; Variables
+; Parameters
 (parameter name: (identifier) @variable.parameter)
-(var_def name: (identifier) @variable)
+
+; Variables
+(var_def name: (pattern) @variable)
 (identifier) @variable
+
+; Fields
+(field_expression field: (identifier) @property)
