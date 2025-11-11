@@ -1,3 +1,5 @@
+// hi
 fn main(){
 	brint("hello world");
+	return 1 + 2;
 }
