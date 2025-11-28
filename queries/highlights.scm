@@ -1,23 +1,38 @@
+; Comments
+(comment) @comment
+
 ; Keywords
 [
   "fn"
   "return"
   "set"
-  "var"
-  "set"
   "for"
   "if"
   "else"
-  (break_statement)
-  (continue_statement)
+  "print"
+  "break"
+  "continue"
+  "extern"
 ] @keyword
 
-; Built-in types
-(identifier) @type.builtin
-  (#match? @type.builtin "^(int|string|bool|set)$")
+; ; Variables
+(var_def name: (pattern) @variable)
+(identifier) @variable
 
-; Comments
-(comment) @comment
+
+; Function definitions
+(fn_def name: (identifier) @function)
+
+; Parameters
+(parameter (identifier) @variable.parameter)
+
+; Function calls
+(call_expression
+  function: (expression (atom (identifier) @function.call)))
+
+; Builtin type
+((identifier) @type.builtin
+  (#eq? @type.builtin "set"))
 
 ; Numbers
 (number) @constant.numeric
@@ -26,22 +41,9 @@
 (string) @string
 (string_esc) @constant.character.escape
 
-; Function definitions and calls
-(fn_def name: (identifier) @function)
-(call_expression function: (expression (identifier) @function.call))
-
-; Parameters
-(parameter name: (identifier) @variable.parameter)
-
-; Variables
-(var_def name: (pattern) @variable)
-(identifier) @variable
-
 ; Punctuation
 [ "{" "}" "(" ")" "[" "]" ] @punctuation.bracket
-[ "," ":" ";" ] @punctuation.delimiter
+[ "," ";" ] @punctuation.delimiter
 
 ; Fields
 (field_expression field: (identifier) @property)
-
-; TODO: functions, operators

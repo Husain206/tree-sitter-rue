@@ -32,8 +32,10 @@ module.exports = grammar({
   rules: {
     source_file: ($) => repeat($._definition),
 
-    comment: ($) =>
-      token(choice(seq("//", /.*/), seq("/*", /[^*]*\*+([^/*][^*]*\*+)*/, "/"))),
+    comment: $ => token(choice(
+      seq('//', /[^\n]*/),                           
+      seq('/*', /[^*]*\*+([^/*][^*]*\*+)*/, '*/'),  
+    )),
 
     // ---- Definitions ----
     _definition: ($) => choice($.fn_def, $.var_def),
@@ -42,15 +44,13 @@ module.exports = grammar({
       "fn",
       field("name", $.identifier),
       field("parameters", $.parameter_list),
-      optional(seq(":", field("return_type", $._type))),
       field("body", $.block),
     ),
 
     var_def: ($) => seq(
-      choice("set", "var"),
+      "set",
       field("name", $.pattern),
-      optional(seq(":", $._type)),
-      optional(seq("=", $.expression)),
+      optional(seq(":=", $.expression)),
       ";"
     ),
 
@@ -63,16 +63,13 @@ module.exports = grammar({
 
     parameter: ($) => seq(
       field("name", $.identifier),
-      ":",
-      field("type", $._type)
+      // ":",
+      // field("type", $._type)
     ),
 
     // ---- Types ----
     _type: ($) => choice(
       "set",
-      "int",
-      "string",
-      "bool",
       $.identifier,
       $.array_type
     ),
@@ -82,17 +79,23 @@ module.exports = grammar({
     // ---- Statements ----
     _statement: ($) => choice(
       $.var_def,
+      $.print,
       $.return_statement,
       $.if_statement,
       $.for_statement,
       $.break_statement,
       $.continue_statement,
+      $.extern,
       $.block,
       $._expression_statement,
       ";",
     ),
 
     _expression_statement: ($) => seq($.expression, ";"),
+
+    print: ($) => seq(
+      "print", $.expression, ";"
+    ),
 
     return_statement: ($) => seq("return", optional($.expression), ";"),
 
@@ -102,19 +105,24 @@ module.exports = grammar({
     ),
 
     for_statement: ($) => seq(
-      "for", $.identifier, "in", $.expression, $.block
+      "for", $.identifier, $.expression, $.block
     ),
 
     break_statement: ($) => seq("break", ";"),
     continue_statement: ($) => seq("continue", ";"),
+    extern: ($) => seq(
+      "extern",
+      $.call_expression,
+      ";"
+    ),
 
     block: ($) => seq("{", repeat($._statement), "}"),
 
+    atom: ($) => choice($.identifier, $.string, $.number),
+
     // ---- Expressions ----
     expression: ($) => choice(
-      $.identifier,
-      $.number,
-      $.string,
+      $.atom,
       $.unary_expression,
       $.binary_expression,
       $.postfix_expression,

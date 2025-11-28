@@ -1,5 +1,11 @@
-// hi
-fn main(){
-	brint("hello world");
+fn idk(a, b){
+    return a + b;
+}
+
+fn main(a, b){
+    set a := 12;
+	print("hello world");
+    idk(a, 12);
 	return 1 + 2;
 }
+
