@@ -38,7 +38,7 @@ module.exports = grammar({
     )),
 
     // ---- Definitions ----
-    _definition: ($) => choice($.fn_def, $.var_def),
+    _definition: ($) => choice($.fn_def, $.var_def, $.struct_def, $.import),
 
     fn_def: ($) => seq(
       "fn",
@@ -54,6 +54,18 @@ module.exports = grammar({
       ";"
     ),
 
+    struct_def: ($) => seq(
+      "struct",
+      field("name", $.identifier),
+      field("members", $.member_list),
+    ),
+
+    import: ($) => seq(
+      "import",
+      $.string, 
+      ";",
+    ),
+
     // ---- Parameters ----
     parameter_list: ($) => seq(
       "(",
@@ -67,6 +79,19 @@ module.exports = grammar({
       // field("type", $._type)
     ),
 
+    member_list: ($) => seq(
+      "{",
+      optional(seq($.members, repeat(seq(",", $.members)))),
+      "}"
+    ),
+
+    members: ($) => seq(
+      field("name", $.identifier),
+      // ":",
+      // field("type", $._type)
+    ),
+
+
     // ---- Types ----
     _type: ($) => choice(
       "set",
@@ -78,6 +103,7 @@ module.exports = grammar({
 
     // ---- Statements ----
     _statement: ($) => choice(
+      $.struct_def,
       $.var_def,
       $.print,
       $.return_statement,
@@ -129,7 +155,8 @@ module.exports = grammar({
       $.array,
       $.call_expression,
       $.field_expression,
-      $.parenthesized_expression
+      $.parenthesized_expression,
+      $.struct_literal,
     ),
 
     parenthesized_expression: ($) => seq("(", $.expression, ")"),
@@ -180,6 +207,13 @@ module.exports = grammar({
       "[",
       optional(seq($.pattern, repeat(seq(",", $.pattern)))),
       "]"
+    )),
+
+   struct_literal: ($) => prec(1, seq(
+      field("type", $.identifier),
+      "{",
+      optional(seq($.expression, repeat(seq(",", $.expression)))),
+      "}"
     )),
 
     pattern: ($) => choice(

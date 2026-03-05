@@ -1,3 +1,9 @@
+import "main.rue";
+
+struct a {
+    a, b, c
+}
+
 fn idk(a, b){
     return a + b;
 }
@@ -5,6 +11,8 @@ fn idk(a, b){
 fn main(a, b){
     set a := 12;
 	print("hello world");
+    struct Circle { center, radius }
+    set c := Circle{ Point{ 6, 9 }, 5 };
     idk(a, 12);
 	return 1 + 2;
 }
